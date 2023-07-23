@@ -16,13 +16,15 @@ end
 
 
 function generateModel(; total_agents=25*25, grid_dimensions=(25, 25), 
-   susceptibility=0.3, duration=15, awareness_duration = 30,
+   susceptibility=0.3, duration=15, 
+   awareness_susceptibility = 0.4, awareness_duration = 30,
    influx_probability = 0.0001,
    seed=12345)
 
    properties = Dict(
       :susceptibility => susceptibility,
       :duration => duration,
+      :awareness_susceptibility => awareness_susceptibility,
       :awareness_duration => awareness_duration,
       :influx_probability => influx_probability
    )
@@ -60,7 +62,13 @@ function agent_step!(agent, model)
         # test for possible infectious event
         if rand(model.rng) < (model.susceptibility * (1 - neighbor.awareness))
             neighbor.health = 1
-            neighbor.awareness = 1
+        end
+
+        for neighbor in neighborhood
+            if rand(model.rng) < model.awareness_susceptibility
+               neighbor.awareness = 1
+               neighbor.awareness_duration =0
+            end
         end
 
         if agent.illness_duration > model.duration
@@ -75,7 +83,7 @@ function agent_step!(agent, model)
       agent.awareness_duration += 1
       # after awareness duration forgets
       if agent.awareness_duration > model.awareness_duration
-         agent.awareness = 0
+         agent.awareness /= 2
          agent.awareness_duration = 0
       end
    end

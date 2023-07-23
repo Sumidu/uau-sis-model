@@ -3,8 +3,6 @@ Pkg.activate(".")
 
 include("model.jl")
 
-using CairoMakie # choosing a plotting backend
-
 model = generateModel()
 
 groupcolor(a) = a.health == 1 ? :red : :blue
@@ -14,7 +12,10 @@ adata = [(:health, sum), (:awareness, sum)]
 
 params = Dict(
     :susceptibility => 0:0.01:1,
-    :influx_probability => 0
+    :duration => collect(1:30),
+    :awareness_susceptibility => 0:0.1:1,
+    :awareness_duration => collect(1:30),
+    :influx_probability => [0,0.001]
 )
 
 
